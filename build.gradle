@@ -20,8 +20,15 @@ allprojects {
         maven { url "https://jitpack.io" }
     }
 }
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
-    implementation 'com.github.tg-monitor:telethon:21fca2e92b12c6fe0d6a31adc52e3d4d44cd2128'
-    implementation 'com.github.tg-monitor:notification:338072910226423142121b4180f438345c897daa'
-    implementation 'com.github.tg-monitor:matching:90f241e7ae4fb12d70ca591b9ffb0d5f7f0014dd'
+    implementation 'com.github.tg-monitor:telethon:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:notification:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:matching:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:servicelocator-instances:master-SNAPSHOT'
+
 }

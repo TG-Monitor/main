@@ -1,31 +1,31 @@
 package ai.quantumsense.tgmonitor.main;
 
-import ai.qantumsense.tgmonitor.telethon.TelegramImpl;
-import ai.qantumsense.tgmonitor.telethon.datamapping.JsonGsonDataMapper;
-import ai.quantumsense.tgmonitor.backend.AuthenticatorImpl;
-import ai.quantumsense.tgmonitor.backend.ExecutorImpl;
-import ai.quantumsense.tgmonitor.backend.InteractorFactory;
+import ai.quantumsense.tgmonitor.backend.Interactor;
 import ai.quantumsense.tgmonitor.backend.InteractorImpl;
-import ai.quantumsense.tgmonitor.backend.InteractorImplFactory;
-import ai.quantumsense.tgmonitor.backend.Notificator;
-import ai.quantumsense.tgmonitor.backend.PatternMatcher;
-import ai.quantumsense.tgmonitor.backend.Telegram;
+import ai.quantumsense.tgmonitor.entities.Emails;
+import ai.quantumsense.tgmonitor.entities.EmailsImpl;
+import ai.quantumsense.tgmonitor.entities.Patterns;
+import ai.quantumsense.tgmonitor.entities.PatternsImpl;
+import ai.quantumsense.tgmonitor.entities.Peers;
+import ai.quantumsense.tgmonitor.entities.PeersImpl;
 import ai.quantumsense.tgmonitor.matching.PatternMatcherImpl;
-import ai.quantumsense.tgmonitor.monitor.LoginCodeReader;
-import ai.quantumsense.tgmonitor.monitor.control.Authenticator;
-import ai.quantumsense.tgmonitor.monitor.control.Executor;
-import ai.quantumsense.tgmonitor.monitor.control.MonitorControl;
-import ai.quantumsense.tgmonitor.monitor.control.MonitorControlImpl;
-import ai.quantumsense.tgmonitor.monitor.data.MonitorData;
-import ai.quantumsense.tgmonitor.monitor.data.MonitorDataFactory;
-import ai.quantumsense.tgmonitor.monitor.data.MonitorDataImpl;
-import ai.quantumsense.tgmonitor.monitor.data.MonitorDataImplFactory;
+import ai.quantumsense.tgmonitor.monitor.LoginCodePrompt;
+import ai.quantumsense.tgmonitor.monitor.Monitor;
+import ai.quantumsense.tgmonitor.monitor.MonitorImpl;
 import ai.quantumsense.tgmonitor.notification.NotificatorImpl;
-import ai.quantumsense.tgmonitor.notification.Sender;
 import ai.quantumsense.tgmonitor.notification.format.FormatterImpl;
 import ai.quantumsense.tgmonitor.notification.send.MailgunSender;
+import ai.quantumsense.tgmonitor.servicelocator.ServiceLocator;
+import ai.quantumsense.tgmonitor.servicelocator.instances.EmailsLocator;
+import ai.quantumsense.tgmonitor.servicelocator.instances.InteractorLocator;
+import ai.quantumsense.tgmonitor.servicelocator.instances.LoginCodePromptLocator;
+import ai.quantumsense.tgmonitor.servicelocator.instances.MonitorLocator;
+import ai.quantumsense.tgmonitor.servicelocator.instances.PatternsLocator;
+import ai.quantumsense.tgmonitor.servicelocator.instances.PeersLocator;
+import ai.quantumsense.tgmonitor.telegram.TelegramImpl;
+import ai.quantumsense.tgmonitor.telegram.datamapping.JsonGsonDataMapper;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +35,9 @@ public class Main {
     private static final String TG_API_ID = System.getenv("TG_API_ID");
     private static final String TG_API_HASH = System.getenv("TG_API_HASH");
     private static final String MAILGUN_API_KEY = System.getenv("MAILGUN_API_KEY");
+    private static final String MAILGUN_DOMAIN = "quantumsense.ai";
+    private static final String EMAIL_SENDING_ADDRESS = "tg-monitor@quantumsense.ai";
+    private static final String EMAIL_SENDING_NAME = "TG-Monitor";
     private static final String PHONE_NUMBER = System.getenv("PHONE_NUMBER");
     private static final Set<String> PEERS = new HashSet<>(Arrays.asList(
             "alethena_official",
@@ -51,62 +54,57 @@ public class Main {
             "ico"
     ));
     private static final Set<String> EMAILS = new HashSet<>(Arrays.asList(
-            "danielmweibel@gmail.com"
+            "danielmweibel@gmail.com",
+            "marco.fernandez@quantumsense.ai"
     ));
 
     public static void main(String[] args) {
         checkEnv();
 
-        System.out.println("Creating monitor");
-        LoginCodeReader loginCodeReader = () -> JOptionPane.showInputDialog("Please enter login code");
-        InteractorFactory interactorFactory = new InteractorImplFactory();
-        MonitorDataFactory monitorDataFactory = new MonitorDataImplFactory();
-        Telegram tg = new TelegramImpl(TG_API_ID, TG_API_HASH, new JsonGsonDataMapper(), loginCodeReader, interactorFactory);
-        PatternMatcher patternMatcher = new PatternMatcherImpl(interactorFactory, monitorDataFactory);
-        Sender sender = new MailgunSender(MAILGUN_API_KEY, "quantumsense.ai", "tg-monitor@quantumsense.ai", "TG-Monitor");
-        Notificator notificator = new NotificatorImpl(new FormatterImpl(), sender, monitorDataFactory);
-        Authenticator auth = new AuthenticatorImpl(tg);
-        Executor exec = new ExecutorImpl(tg, monitorDataFactory);
-        new InteractorImpl(patternMatcher, notificator);
-        MonitorControl monitorControl = new MonitorControlImpl(auth, exec);
-        MonitorData monitorData = new MonitorDataImpl();
+        ServiceLocator<Monitor> monitorLocator = new MonitorLocator();
+        ServiceLocator<Interactor> interactorLocator = new InteractorLocator();
+        ServiceLocator<Peers> peersLocator = new PeersLocator();
+        ServiceLocator<Patterns> patternsLocator = new PatternsLocator();
+        ServiceLocator<Emails> emailsLocator = new EmailsLocator();
+        ServiceLocator<LoginCodePrompt> loginCodePromptLocator = new LoginCodePromptLocator();
 
-        System.out.println("Setting monitor data");
-        monitorData.setPeers(PEERS);
-        monitorData.setPatterns(PATTERNS);
-        monitorData.setEmails(EMAILS);
+        new GuiLoginCodePrompt(loginCodePromptLocator);
 
-        System.out.println("Monitor state: " + monitorControl.getState());
-        System.out.println("Logging in with " + PHONE_NUMBER + "...");
-        monitorControl.login(PHONE_NUMBER);
-        System.out.println("Login done");
-        System.out.println("Monitor state: " + monitorControl.getState());
+        new InteractorImpl(
+                new PatternMatcherImpl(interactorLocator, patternsLocator),
+                new NotificatorImpl(new FormatterImpl(), new MailgunSender(MAILGUN_API_KEY, MAILGUN_DOMAIN, EMAIL_SENDING_ADDRESS, EMAIL_SENDING_NAME), emailsLocator),
+                interactorLocator
+        );
 
-        System.out.println("Starting monitor");
-        monitorControl.start();
-        System.out.println("Monitor state: " + monitorControl.getState());
+        new PeersImpl(
+                new MonitorImpl(
+                    new TelegramImpl(TG_API_ID, TG_API_HASH, new JsonGsonDataMapper(),  interactorLocator, loginCodePromptLocator),
+                    monitorLocator),
+                peersLocator
+        );
+        new PatternsImpl(patternsLocator);
+        new EmailsImpl(emailsLocator);
 
-        sleep(30);
+        Monitor monitor = monitorLocator.getService();
+        if (!monitor.isLoggedIn())
+            monitor.login(PHONE_NUMBER);
+        System.out.println("Now logged in");
 
-        System.out.println("Pausing monitor");
-        monitorControl.pause();
-        System.out.println("Monitor state: " + monitorControl.getState());
+        Emails emails = emailsLocator.getService();
+        Patterns patterns = patternsLocator.getService();
+        Peers peers = peersLocator.getService();
 
-        sleep(10);
+        System.out.println("Setting notification email addresses");
+        emails.addEmails(EMAILS);
+        System.out.println("Setting patterns");
+        patterns.addPatterns(PATTERNS);
+        System.out.println("Starting monitors");
+        peers.addPeers(PEERS);
 
-        System.out.println("Starting monitor");
-        monitorControl.start();
-        System.out.println("Monitor state: " + monitorControl.getState());
+        sleep(60);
 
-        sleep(30);
-
-        System.out.println("Pausing monitor");
-        monitorControl.pause();
-        System.out.println("Monitor state: " + monitorControl.getState());
-
-        System.out.println("Logging out");
-        monitorControl.logout();
-        System.out.println("Monitor state: " + monitorControl.getState());
+        System.out.println("Stopping monitors");
+        peers.removePeers(PEERS);
     }
 
     private static void checkEnv() {
@@ -124,6 +122,16 @@ public class Main {
             Thread.sleep(sec * 1000);
         } catch (InterruptedException e) {
 
+        }
+    }
+
+    private static class GuiLoginCodePrompt implements LoginCodePrompt {
+        public GuiLoginCodePrompt(ServiceLocator<LoginCodePrompt> locator) {
+            locator.registerService(this);
+        }
+        @Override
+        public String promptLoginCode() {
+            return JOptionPane.showInputDialog("Please enter login code");
         }
     }
 }
