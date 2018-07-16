@@ -44,14 +44,22 @@ public class Main {
             "icocountdown",
             "icorankingreviews",
             "tezosico",
-            "cryptobayto"
+            "cryptobayto",
+            "savedroid",
+            "arenatrading"
     ));
     private static final Set<String> PATTERNS = new HashSet<>(Arrays.asList(
             "bitcoin",
             "crash",
             "scam",
             "ethereum",
-            "ico"
+            "ico",
+            "top",
+            "coin",
+            "BTC",
+            "btc",
+            "Bittrex"
+
     ));
     private static final Set<String> EMAILS = new HashSet<>(Arrays.asList(
             "danielmweibel@gmail.com",
@@ -76,12 +84,10 @@ public class Main {
                 interactorLocator
         );
 
-        new PeersImpl(
-                new MonitorImpl(
-                    new TelegramImpl(TG_API_ID, TG_API_HASH, new JsonGsonDataMapper(),  interactorLocator, loginCodePromptLocator),
-                    monitorLocator),
-                peersLocator
-        );
+        new MonitorImpl(new TelegramImpl(TG_API_ID, TG_API_HASH, new JsonGsonDataMapper(), peersLocator, interactorLocator, loginCodePromptLocator),
+                monitorLocator);
+
+        new PeersImpl(peersLocator);
         new PatternsImpl(patternsLocator);
         new EmailsImpl(emailsLocator);
 
@@ -94,17 +100,21 @@ public class Main {
         Patterns patterns = patternsLocator.getService();
         Peers peers = peersLocator.getService();
 
-        System.out.println("Setting notification email addresses");
-        emails.addEmails(EMAILS);
-        System.out.println("Setting patterns");
-        patterns.addPatterns(PATTERNS);
-        System.out.println("Starting monitors");
+        System.out.println("Setting peers");
         peers.addPeers(PEERS);
 
+        System.out.println("Setting patterns");
+        patterns.addPatterns(PATTERNS);
+
+        System.out.println("Setting notification email addresses");
+        emails.addEmails(EMAILS);
+
+        System.out.println("Starting monitor");
+        monitor.start();
         sleep(60);
 
-        System.out.println("Stopping monitors");
-        peers.removePeers(PEERS);
+        System.out.println("Stopping monitor");
+        monitor.stop();
     }
 
     private static void checkEnv() {
