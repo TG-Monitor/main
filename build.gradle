@@ -29,10 +29,9 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'com.github.tg-monitor:telegram:master-SNAPSHOT'
-    implementation 'com.github.tg-monitor:notification:master-SNAPSHOT'
-    implementation 'com.github.tg-monitor:matching:master-SNAPSHOT'
-    implementation 'com.github.tg-monitor:cli:master-SNAPSHOT'
-    implementation 'com.github.tg-monitor:servicelocator-instances:master-SNAPSHOT'
-
+    implementation 'com.github.tg-monitor:telegram:0.0.1'
+    implementation 'com.github.tg-monitor:notification:0.0.1'
+    implementation 'com.github.tg-monitor:matching:0.0.1'
+    implementation 'com.github.tg-monitor:cli:0.0.1'
+    implementation 'com.github.tg-monitor:servicelocator-instances:0.0.1'
 }
