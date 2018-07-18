@@ -6,7 +6,7 @@ apply plugin: 'application'
 mainClassName = 'ai.quantumsense.tgmonitor.main.Main'
 
 group 'ai.quantumsense.tgmonitor'
-version '0.0.1'
+version '0.0.3'
 
 sourceCompatibility = 1.8
 
@@ -29,9 +29,11 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'com.github.tg-monitor:telegram:0.0.1'
-    implementation 'com.github.tg-monitor:notification:0.0.1'
-    implementation 'com.github.tg-monitor:matching:0.0.1'
-    implementation 'com.github.tg-monitor:cli:0.0.1'
-    implementation 'com.github.tg-monitor:servicelocator-instances:0.0.1'
+    implementation 'com.github.tg-monitor:cli:0.0.3'
+    implementation 'com.github.tg-monitor:monitor:0.0.3'
+    implementation 'com.github.tg-monitor:backend:0.0.3'
+    implementation 'com.github.tg-monitor:telegram:0.0.3'
+    implementation 'com.github.tg-monitor:notification:0.0.3'
+    implementation 'com.github.tg-monitor:matching:0.0.3'
+    implementation 'com.github.tg-monitor:servicelocator-instances:0.0.3'
 }
