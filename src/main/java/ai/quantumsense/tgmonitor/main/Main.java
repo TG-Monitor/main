@@ -30,12 +30,10 @@ public class Main {
     private static final String TG_API_ID = System.getenv("TG_API_ID");
     private static final String TG_API_HASH = System.getenv("TG_API_HASH");
     private static final String MAILGUN_API_KEY = System.getenv("MAILGUN_API_KEY");
-    private static final String PHONE_NUMBER = System.getenv("PHONE_NUMBER");
+    private static final String MAILGUN_DOMAIN = System.getenv("MAILGUN_DOMAIN");
+    private static final String MAILGUN_SENDING_ADDRESS = System.getenv("MAILGUN_SENDING_ADDRESS");
 
-    private static final String MAILGUN_DOMAIN = "quantumsense.ai";
-    private static final String EMAIL_SENDING_ADDRESS = "tg-monitor@quantumsense.ai";
     private static final String EMAIL_SENDING_NAME = "TG-Monitor";
-
 
     public static void main(String[] args) {
         checkEnv();
@@ -58,7 +56,7 @@ public class Main {
 
         new InteractorImpl(
                 new PatternMatcherImpl(interactorLocator, patternsLocator),
-                new NotificatorImpl(new FormatterImpl(), new MailgunSender(MAILGUN_API_KEY, MAILGUN_DOMAIN, EMAIL_SENDING_ADDRESS, EMAIL_SENDING_NAME), emailsLocator),
+                new NotificatorImpl(new FormatterImpl(), new MailgunSender(MAILGUN_API_KEY, MAILGUN_DOMAIN, MAILGUN_SENDING_ADDRESS, EMAIL_SENDING_NAME), emailsLocator),
                 interactorLocator);
 
         Cli cli = new Cli(peersLocator, patternsLocator, emailsLocator, monitorLocator, loginCodePromptLocator);
@@ -70,7 +68,8 @@ public class Main {
         if (TG_API_ID == null) missing = "TG_API_ID";
         else if (TG_API_HASH == null) missing = "TG_API_HASH";
         else if (MAILGUN_API_KEY == null) missing = "MAILGUN_API_KEY";
-        else if (PHONE_NUMBER == null) missing = "PHONE_NUMBER";
+        else if (MAILGUN_DOMAIN == null) missing = "MAILGUN_DOMAIN";
+        else if (MAILGUN_SENDING_ADDRESS == null) missing = "MAILGUN_SENDING_ADDRESS";
         if (missing != null)
             throw new RuntimeException("Must set " + missing + " environment variable");
     }
