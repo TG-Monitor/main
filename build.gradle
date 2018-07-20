@@ -29,7 +29,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'com.github.tg-monitor:tgm-cli:0.0.4'
+    implementation 'com.github.tg-monitor:tgmc-cli:0.0.4'
     implementation 'com.github.tg-monitor:tgm-monitor:0.0.3'
     implementation 'com.github.tg-monitor:tgm-backend:0.0.3'
     implementation 'com.github.tg-monitor:tgm-telegram:0.0.3'
