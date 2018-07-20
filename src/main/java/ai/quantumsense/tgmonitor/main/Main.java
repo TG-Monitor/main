@@ -13,6 +13,8 @@ import ai.quantumsense.tgmonitor.matching.PatternMatcherImpl;
 import ai.quantumsense.tgmonitor.monitor.LoginCodePrompt;
 import ai.quantumsense.tgmonitor.monitor.Monitor;
 import ai.quantumsense.tgmonitor.monitor.MonitorImpl;
+import ai.quantumsense.tgmonitor.monitorfacade.MonitorFacade;
+import ai.quantumsense.tgmonitor.monitorfacade.MonitorFacadeImpl;
 import ai.quantumsense.tgmonitor.notification.NotificatorImpl;
 import ai.quantumsense.tgmonitor.notification.format.FormatterImpl;
 import ai.quantumsense.tgmonitor.notification.send.MailgunSender;
@@ -34,6 +36,8 @@ public class Main {
     private static final String MAILGUN_SENDING_ADDRESS = System.getenv("MAILGUN_SENDING_ADDRESS");
 
     private static final String EMAIL_SENDING_NAME = "TG-Monitor";
+
+    private static final String VERSION = "0.0.5";
 
     public static void main(String[] args) {
         checkEnv();
@@ -59,7 +63,8 @@ public class Main {
                 new NotificatorImpl(new FormatterImpl(), new MailgunSender(MAILGUN_API_KEY, MAILGUN_DOMAIN, MAILGUN_SENDING_ADDRESS, EMAIL_SENDING_NAME), emailsLocator),
                 interactorLocator);
 
-        Cli cli = new Cli(peersLocator, patternsLocator, emailsLocator, monitorLocator, loginCodePromptLocator);
+        MonitorFacade monitorFacade = new MonitorFacadeImpl(monitorLocator, peersLocator, patternsLocator, emailsLocator, loginCodePromptLocator);
+        Cli cli = new Cli(monitorFacade, VERSION);
         cli.launch();
     }
 
