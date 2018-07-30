@@ -63,8 +63,9 @@ public class Main {
                 new NotificatorImpl(new FormatterImpl(), new MailgunSender(MAILGUN_API_KEY, MAILGUN_DOMAIN, MAILGUN_SENDING_ADDRESS, EMAIL_SENDING_NAME), emailsLocator),
                 interactorLocator);
 
-        MonitorFacade monitorFacade = new MonitorFacadeImpl(monitorLocator, peersLocator, patternsLocator, emailsLocator, loginCodePromptLocator);
-        Cli cli = new Cli(monitorFacade, VERSION);
+        Cli cli = new Cli(
+                new MonitorFacadeImpl(monitorLocator, peersLocator, patternsLocator, emailsLocator, loginCodePromptLocator),
+                VERSION);
         cli.launch();
     }
 
