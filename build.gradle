@@ -30,12 +30,14 @@ configurations.all {
 
 dependencies {
     implementation 'com.github.tg-monitor:tgm-cli:master-SNAPSHOT'
-    implementation 'com.github.tg-monitor:tgm-monitor:0.0.4'
-    implementation 'com.github.tg-monitor:tgm-backend:0.0.4'
-    implementation 'com.github.tg-monitor:tgm-telegram:0.0.4'
+    implementation 'com.github.tg-monitor:tgm-monitor:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-corefacade:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-backend:master-SNAPSHOT'
+    implementation 'com.github.tg-monitor:tgm-telegram:master-SNAPSHOT'
     implementation 'com.github.tg-monitor:tgm-notification:0.0.5'
     implementation 'com.github.tg-monitor:tgm-matching:0.0.4'
-    implementation 'com.github.tg-monitor:tgm-servicelocator-instances:0.0.4'
+    implementation 'com.github.tg-monitor:tgm-servicelocator-instances:master-SNAPSHOT'
     implementation 'com.github.tg-monitor:tgm-entities:0.0.2'
+    implementation 'com.github.tg-monitor:tgm-logincodeprompt:0.0.1'
     implementation 'com.github.tg-monitor:tgm-servicelocator:0.0.1'
 }
